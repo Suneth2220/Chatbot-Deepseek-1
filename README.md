@@ -25,7 +25,7 @@ A feature-rich web-based chatbot that connects to the OpenRouter API to deliver 
 ## 🛠️ REQUIRED CONFIGURATION
 
 *const API_KEY = "your_openrouter_api_key_here";*  
-*const MODEL = "deepseek/deepseek-chat-v3-0324:free";*
+*const MODEL = "your_ai_model_here";*
 
 Get your API key from: https://openrouter.ai/keys
 
