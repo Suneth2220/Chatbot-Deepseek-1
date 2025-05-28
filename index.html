@@ -79,6 +79,7 @@
             flex-direction: column;
             gap: 12px;
         }
+        
 
         .message {
             max-width: 80%;
@@ -238,6 +239,23 @@
             border-radius: 4px;
             cursor: pointer;
         }
+
+        .bot-message ul {
+            margin: 8px 0;
+            padding-left: 20px;
+        }
+        
+        .bot-message li {
+            margin-bottom: 6px;
+        }
+        
+        .bot-message strong {
+            color: #6e8efb;
+        }
+        
+        .bot-message p {
+            margin-bottom: 8px;
+        }
     </style>
 </head>
 <body>
@@ -289,6 +307,10 @@
             const chatInputArea = document.getElementById('chatInputArea');
 
             let apiKey = localStorage.getItem('openRouterApiKey');
+            if (!apiKey) {
+                apiKey = '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';
+                localStorage.setItem('openRouterApiKey', apiKey);
+            }
             if (apiKey) {
                 apiKeyInput.style.display = 'none';
                 chatInputArea.style.display = 'flex';
@@ -342,7 +364,8 @@
                 } catch (error) {
                     typingIndicator.style.display = 'none';
                     addMessage("Sorry, I encountered an error. Please try again.", 'bot');
-                    console.error('Error:', error);
+                    console.error('Full error:', error);
+                    console.error('API Key:', apiKey ? 'Exists' : 'Missing');
                 }
             }
 
@@ -361,7 +384,9 @@
                         "messages": [
                             {
                                 "role": "system",
-                                "content": "You are a helpful AI assistant. Respond concisely and helpfully."
+                                "content": "You are a helpful AI assistant. Always format your responses with clear organization. " +
+                                           "Use bullet points for lists, bold text for key terms, and proper paragraph structure. " +
+                                           "Keep responses concise but informative."
                             },
                             {
                                 "role": "user",
@@ -379,12 +404,32 @@
                 return data.choices[0].message.content;
             }
 
-            // Add message to chat
+            // Modified addMessage function to handle HTML content
             function addMessage(text, sender) {
                 const messageDiv = document.createElement('div');
                 messageDiv.classList.add('message');
                 messageDiv.classList.add(sender + '-message');
-                messageDiv.textContent = text;
+                
+                // Only parse as HTML for bot messages to prevent XSS from user input
+                if (sender === 'bot') {
+                    // Simple sanitization and line break conversion
+                    const sanitized = text
+                        .replace(/</g, '&lt;').replace(/>/g, '&gt;') // Basic HTML escaping
+                        .replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>') // Markdown bold to HTML
+                        .replace(/\n/g, '<br>') // Newlines to breaks
+                        .replace(/\- (.*?)(<br>|$)/g, '<li>$1</li>'); // Bullet points to list items
+                    
+                    // Wrap list items in ul if we find any
+                    if (sanitized.includes('<li>')) {
+                        messageDiv.innerHTML = sanitized.replace(/(<li>.*?<\/li>)+/g, 
+                            match => `<ul>${match}</ul>`);
+                    } else {
+                        messageDiv.innerHTML = sanitized;
+                    }
+                } else {
+                    messageDiv.textContent = text;
+                }
+                
                 chatMessages.appendChild(messageDiv);
                 chatMessages.scrollTop = chatMessages.scrollHeight;
             }
