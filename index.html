@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chatbot with OpenRouter</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: #f5f7fa;
+            padding: 20px;
+        }
+
+        .chatbot-container {
+            width: 400px;
+            height: 600px;
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .chatbot-header {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            padding: 16px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chatbot-title {
+            font-weight: 600;
+            font-size: 18px;
+        }
+
+        .chatbot-controls {
+            display: flex;
+            gap: 10px;
+        }
+
+        .control-btn {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            color: white;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+
+        .control-btn:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+
+        .chatbot-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            background-color: #f9f9f9;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 12px 16px;
+            border-radius: 18px;
+            font-size: 14px;
+            line-height: 1.4;
+            position: relative;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .user-message {
+            align-self: flex-end;
+            background-color: #6e8efb;
+            color: white;
+            border-bottom-right-radius: 4px;
+        }
+
+        .bot-message {
+            align-self: flex-start;
+            background-color: white;
+            color: #333;
+            border: 1px solid #e0e0e0;
+            border-bottom-left-radius: 4px;
+        }
+        
+
+        .chatbot-input-area {
+            padding: 16px;
+            border-top: 1px solid #eee;
+            display: flex;
+            gap: 10px;
+            background-color: white;
+        }
+
+        .chatbot-input {
+            flex: 1;
+            padding: 12px 16px;
+            border: 1px solid #ddd;
+            border-radius: 24px;
+            outline: none;
+            font-size: 14px;
+            transition: border 0.2s;
+        }
+
+        .chatbot-input:focus {
+            border-color: #a777e3;
+        }
+
+        .send-btn {
+            background: linear-gradient(135deg, #6e8efb, #a777e3);
+            color: white;
+            border: none;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s, opacity 0.2s;
+        }
+
+        .send-btn:hover {
+            transform: scale(1.05);
+            opacity: 0.9;
+        }
+
+        .send-btn:active {
+            transform: scale(0.98);
+        }
+
+        .typing-indicator {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            padding: 8px 16px;
+            background-color: white;
+            border: 1px solid #e0e0e0;
+            border-radius: 18px;
+            align-self: flex-start;
+            margin-bottom: 8px;
+            display: none;
+        }
+
+        .typing-dot {
+            width: 8px;
+            height: 8px;
+            background-color: #a777e3;
+            border-radius: 50%;
+            animation: typingAnimation 1.4s infinite ease-in-out;
+        }
+
+        .typing-dot:nth-child(1) {
+            animation-delay: 0s;
+        }
+
+        .typing-dot:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dot:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typingAnimation {
+            0%, 60%, 100% { transform: translateY(0); }
+            30% { transform: translateY(-5px); }
+        }
+
+        .minimized {
+            height: 60px;
+        }
+
+        .minimized .chatbot-messages,
+        .minimized .chatbot-input-area {
+            display: none;
+        }
+
+        .api-key-input {
+            padding: 16px;
+            border-top: 1px solid #eee;
+            background-color: #f5f5f5;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .api-key-input label {
+            font-size: 12px;
+            color: #666;
+        }
+
+        .api-key-field {
+            display: flex;
+            gap: 8px;
+        }
+
+        .api-key-field input {
+            flex: 1;
+            padding: 8px 12px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+            font-size: 14px;
+        }
+
+        .api-key-field button {
+            padding: 8px 12px;
+            background-color: #6e8efb;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+    <div class="chatbot-container" id="chatbotContainer">
+        <div class="chatbot-header">
+            <div class="chatbot-title">AI Chatbot</div>
+            <div class="chatbot-controls">
+                <button class="control-btn" id="minimizeBtn">−</button>
+                <button class="control-btn" id="closeBtn">×</button>
+            </div>
+        </div>
+        <div class="chatbot-messages" id="chatMessages">
+            <div class="typing-indicator" id="typingIndicator">
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+                <div class="typing-dot"></div>
+            </div>
+        </div>
+        <div class="api-key-input" id="apiKeyInput">
+            <label for="apiKey">OpenRouter API Key:</label>
+            <div class="api-key-field">
+                <input type="password" id="apiKey" placeholder="Enter your API key">
+                <button id="saveApiKey">Save</button>
+            </div>
+        </div>
+        <div class="chatbot-input-area" id="chatInputArea" style="display: none;">
+            <input type="text" class="chatbot-input" id="userInput" placeholder="Type your message here...">
+            <button class="send-btn" id="sendBtn">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                    <path d="M22 2L11 13" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                    <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const chatbotContainer = document.getElementById('chatbotContainer');
+            const chatMessages = document.getElementById('chatMessages');
+            const userInput = document.getElementById('userInput');
+            const sendBtn = document.getElementById('sendBtn');
+            const minimizeBtn = document.getElementById('minimizeBtn');
+            const closeBtn = document.getElementById('closeBtn');
+            const typingIndicator = document.getElementById('typingIndicator');
+            const apiKeyInput = document.getElementById('apiKeyInput');
+            const apiKeyField = document.getElementById('apiKey');
+            const saveApiKeyBtn = document.getElementById('saveApiKey');
+            const chatInputArea = document.getElementById('chatInputArea');
+
+            let apiKey = localStorage.getItem('openRouterApiKey');
+            if (apiKey) {
+                apiKeyInput.style.display = 'none';
+                chatInputArea.style.display = 'flex';
+                addMessage("Hello! I'm an AI assistant powered by OpenRouter. How can I help you today?", 'bot');
+            }
+
+            // Minimize and close functionality
+            minimizeBtn.addEventListener('click', function() {
+                chatbotContainer.classList.toggle('minimized');
+                minimizeBtn.textContent = chatbotContainer.classList.contains('minimized') ? '+' : '−';
+            });
+
+            closeBtn.addEventListener('click', function() {
+                chatbotContainer.style.display = 'none';
+                setTimeout(() => {
+                    if (confirm('Do you want to reopen the chatbot?')) {
+                        chatbotContainer.style.display = 'flex';
+                    }
+                }, 300);
+            });
+
+            // Save API key
+            saveApiKeyBtn.addEventListener('click', function() {
+                const key = apiKeyField.value.trim();
+                if (key) {
+                    localStorage.setItem('openRouterApiKey', key);
+                    apiKey = key;
+                    apiKeyInput.style.display = 'none';
+                    chatInputArea.style.display = 'flex';
+                    addMessage("API key saved. How can I help you today?", 'bot');
+                }
+            });
+
+            // Send message function
+            async function sendMessage() {
+                const message = userInput.value.trim();
+                if (message === '') return;
+
+                // Add user message to chat
+                addMessage(message, 'user');
+                userInput.value = '';
+
+                // Show typing indicator
+                typingIndicator.style.display = 'flex';
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+
+                try {
+                    const response = await fetchOpenRouterResponse(message);
+                    typingIndicator.style.display = 'none';
+                    addMessage(response, 'bot');
+                } catch (error) {
+                    typingIndicator.style.display = 'none';
+                    addMessage("Sorry, I encountered an error. Please try again.", 'bot');
+                    console.error('Error:', error);
+                }
+            }
+
+            // Fetch response from OpenRouter API
+            async function fetchOpenRouterResponse(userMessage) {
+                const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
+                    method: "POST",
+                    headers: {
+                        "Authorization": `Bearer ${apiKey}`,
+                        "HTTP-Referer": window.location.href,
+                        "X-Title": "AI Chatbot",
+                        "Content-Type": "application/json"
+                    },
+                    body: JSON.stringify({
+                        "model": "deepseek/deepseek-chat-v3-0324:free",
+                        "messages": [
+                            {
+                                "role": "system",
+                                "content": "You are a helpful AI assistant. Respond concisely and helpfully."
+                            },
+                            {
+                                "role": "user",
+                                "content": userMessage
+                            }
+                        ]
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`API request failed with status ${response.status}`);
+                }
+
+                const data = await response.json();
+                return data.choices[0].message.content;
+            }
+
+            // Add message to chat
+            function addMessage(text, sender) {
+                const messageDiv = document.createElement('div');
+                messageDiv.classList.add('message');
+                messageDiv.classList.add(sender + '-message');
+                messageDiv.textContent = text;
+                chatMessages.appendChild(messageDiv);
+                chatMessages.scrollTop = chatMessages.scrollHeight;
+            }
+
+            // Event listeners
+            sendBtn.addEventListener('click', sendMessage);
+            userInput.addEventListener('keypress', function(e) {
+                if (e.key === 'Enter') {
+                    sendMessage();
+                }
+            });
+        });
+    </script>
+</body>
+</html>
