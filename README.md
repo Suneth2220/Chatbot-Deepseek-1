@@ -1,36 +1,31 @@
-🤖 AI Chatbot with OpenRouter API
-Chatbot Demo Example of the chatbot interface in action
+# 🤖 AI Chatbot with OpenRouter API
 
-A beautiful, responsive web-based chatbot interface that connects to the OpenRouter API to provide intelligent AI conversations. Features real-time typing indicators, message history, and a modern UI.
+*A beautiful, responsive chatbot interface powered by OpenRouter*
 
-✨ Features
-Modern Interface: Clean, responsive design that works on all devices
+A feature-rich web-based chatbot that connects to the OpenRouter API to deliver intelligent conversations with a sleek, modern interface.
 
-OpenRouter Integration: Connects to multiple AI models through OpenRouter
+## ✨ Key Features
 
-Real-time Interactions: Typing indicators and smooth message streaming
+| Feature | Description |
+|---------|-------------|
+| **🌐 Responsive Design** | Works flawlessly on desktop and mobile devices |
+| **⚡ Real-time Interactions** | Typing indicators and smooth message streaming |
+| **🧠 Multi-Model Support** | Connect to any model available on OpenRouter |
+| **📝 Conversation History** | Maintains context throughout your chat session |
+| **🔧 Easy Configuration** | Set up in minutes with just your API key |
 
-Conversation History: Maintains context during your chat session
+## 🚀 Quick Start
 
-Easy Configuration: Simple setup with your API key and preferred model
+1. **Clone the repository**
+   ```bash
+   git clone https://github.com/yourusername/ai-chatbot.git
+   cd ai-chatbot
 
-🚀 Quick Start
-Clone the repository:
 
-bash
-git clone https://github.com/yourusername/ai-chatbot.git
-cd ai-chatbot
-Configure your API:
+## 🛠️ REQUIRED CONFIGURATION
 
-Open index.html in a text editor
+*const API_KEY = "your_openrouter_api_key_here";*  
+*const MODEL = "deepseek/deepseek-chat-v3-0324:free";*
 
-Locate the configuration section and add your credentials:
+Get your API key from: https://openrouter.ai/keys
 
-javascript
-const API_KEY = "your_openrouter_api_key_here"; // Get from https://openrouter.ai/keys
-const MODEL = "deepseek/deepseek-chat-v3-0324:free"; // Or your preferred model
-Open in browser:
-
-Simply open index.html in your preferred web browser
-
-No server required - works directly from your filesystem!
