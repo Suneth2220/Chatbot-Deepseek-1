@@ -306,16 +306,11 @@
             const saveApiKeyBtn = document.getElementById('saveApiKey');
             const chatInputArea = document.getElementById('chatInputArea');
 
-            let apiKey = localStorage.getItem('openRouterApiKey');
-            if (!apiKey) {
-                apiKey = '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';
-                localStorage.setItem('openRouterApiKey', apiKey);
-            }
-            if (apiKey) {
-                apiKeyInput.style.display = 'none';
-                chatInputArea.style.display = 'flex';
-                addMessage("Hello! I'm an AI assistant powered by OpenRouter. How can I help you today?", 'bot');
-            }
+            let apiKey = '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';
+            // Always use the provided API key, never ask or show the API key input
+            apiKeyInput.style.display = 'none';
+            chatInputArea.style.display = 'flex';
+            addMessage("Hello! I'm an AI assistant powered by OpenRouter. How can I help you today?", 'bot');
 
             // Minimize and close functionality
             minimizeBtn.addEventListener('click', function() {
@@ -330,18 +325,6 @@
                         chatbotContainer.style.display = 'flex';
                     }
                 }, 300);
-            });
-
-            // Save API key
-            saveApiKeyBtn.addEventListener('click', function() {
-                const key = apiKeyField.value.trim();
-                if (key) {
-                    localStorage.setItem('openRouterApiKey', key);
-                    apiKey = key;
-                    apiKeyInput.style.display = 'none';
-                    chatInputArea.style.display = 'flex';
-                    addMessage("API key saved. How can I help you today?", 'bot');
-                }
             });
 
             // Send message function
